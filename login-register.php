@@ -127,7 +127,25 @@ if (isset($_POST['submit'])) {
 
 
 if ($form_good == TRUE) {
-    $message_pass = "<p>Congratulations you have sucessfully registered!</p>";
+    
+    include_once("database-connection.php");
+    $sql = "INSERT INTO authentication(Email_ID, Password) VALUES (?,?)";
+
+     //mysqli_stmt_init() is used to initialize a new statement object, which is then prepared with a SQL statement using mysqli_stmt_prepare()
+    $initialize_statement = mysqli_stmt_init($connect);
+    $prepare_statement = mysqli_stmt_prepare($initialize_statement, $sql);
+    if ($prepare_statement) {
+        //the first argument should be the statement object, second argument should be the type of values
+        //the ss means that two variables are being bound, and both variables are string 
+        mysqli_stmt_bind_param($initialize_statement,"ss" ,$email , $password_hash);
+        mysqli_stmt_execute($initialize_statement);
+        $message_pass = "<p>Congratulations you have sucessfully registered!</p>";
+    }
+    //if execution failure occurs 
+    else {
+        die("Execution failed in the database");
+    }
+
 }
 
 
