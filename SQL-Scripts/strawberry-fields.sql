@@ -1,0 +1,40 @@
+CREATE TABLE authentication (
+  Email_ID VARCHAR(255) COLLATE utf8mb4_General_ci NOT NULL,
+  Password CHAR(60) NOT NULL,
+  PRIMARY KEY (Email_ID)
+);
+CREATE TABLE Customer (
+  Email_ID VARCHAR(255) COLLATE utf8mb4_General_ci NOT NULL,
+  FirstName VARCHAR(50) NOT NULL,
+  LastName VARCHAR(50) NOT NULL,
+  Phone VARCHAR(15) NOT NULL,
+  PRIMARY KEY (Email_ID),
+  FOREIGN KEY (Email_ID) REFERENCES authentication(Email_ID)
+);
+CREATE TABLE Waitlist (
+  Waitlist_ID INT NOT NULL AUTO_INCREMENT,
+  Email_ID VARCHAR(255) COLLATE utf8mb4_General_ci NOT NULL,
+  Date_Available DATE NOT NULL DEFAULT CURRENT_DATE,
+  Time_Available TIME NOT NULL DEFAULT CURRENT_TIME,
+  Quantity INT NOT NULL,
+  ConfirmYN CHAR(1) NOT NULL DEFAULT 'N',
+  PRIMARY KEY (Waitlist_ID),
+  INDEX Waitlist_WaitlistID (Waitlist_ID),
+  FOREIGN KEY (Email_ID) REFERENCES Customer(Email_ID)
+);
+CREATE TABLE Appointment (
+  Appointment_ID INT NOT NULL AUTO_INCREMENT,
+  Email_ID VARCHAR(255) COLLATE utf8mb4_General_ci NOT NULL,
+  Date_Booked DATE NOT NULL DEFAULT CURRENT_DATE,
+  Time_Booked TIME NOT NULL DEFAULT CURRENT_TIME,
+  Quantity INT NOT NULL,
+  ConfirmYN CHAR(1) NOT NULL DEFAULT 'N',
+  PRIMARY KEY (Appointment_ID),
+  INDEX Appointment_AppointmentID (Appointment_ID ),
+  FOREIGN KEY (Email_ID) REFERENCES Customer(Email_ID)
+);
+
+
+--Create a developer role in database 
+--db password sb_developer
+CREATE USER 'sb_developer'@'localhost' IDENTIFIED VIA mysql_native_password USING '***';GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, FILE, INDEX, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, TRIGGER, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EXECUTE ON *.* TO 'sb_developer'@'localhost' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
