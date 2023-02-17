@@ -7,6 +7,8 @@ $password = (isset($_POST['submit'])) ? trim($_POST['password']) : "";
 $confirm_password = (isset($_POST['submit'])) ? trim($_POST['confirm-password']) : "";
 $phone = (isset($_POST['submit'])) ? trim($_POST['phone']) : "";
 
+//Encryption of password 
+$password_hash = password_hash($password,PASSWORD_DEFAULT);
 
 // Message Variables
 $message_first_name = "";
@@ -80,37 +82,49 @@ if (isset($_POST['submit'])) {
         }
 
     }
-}
-
-//  PHONE NUMBER
-if ($phone == "") {
-    $message_phone = "<p>Please enter your phone number.</p>";
-    $form_good = FALSE;
-} else {
-    $phone = filter_var($phone, FILTER_SANITIZE_NUMBER_INT);
-}
-if ($phone == FALSE) {
-    $message_phone = "<p>Please enter your phone number without letters or special characters.</p>";
-    $form_good = FALSE;
-} else {
-    // Let's strip out any potential extra characters the users punched in.
-    $phone = str_replace('-', '', $phone);
-    $phone = str_replace('+', '', $phone);
-    $phone = str_replace('.', '', $phone);
-    $phone = str_replace('(', '', $phone);
-    $phone = str_replace(')', '', $phone);
-}
-// Let's check to see if, after we've stripped all of the special characters away, whether or not we have a number left.
-if (!is_numeric($phone)) {
-    $message_phone = "<p>Please enter your phone number without letters or special characters.</p>";
-    $form_good = FALSE;
-} else {
-    // Let's test the length of the number. Let's assume we want a Canadian number. That means we want 10 digits. (ex. 780 123 4567)
-    if (strlen($phone) != 10) {
-        $message_phone = "<p>Please enter a ten-digit Canadian phone number.</p>";
+    //Password Validation 
+    if(strlen($password)<8){
+        $message_password = "<p>Your password cannot be less than 8 characters long </p>";
         $form_good = FALSE;
     }
+    if($password !== $confirm_password){
+        $message_confirm_password = "<p>Your passwords do not match </p>";
+        $form_good = FALSE; 
+    }
+
+
+    //  PHONE NUMBER
+    if ($phone == "") {
+        $message_phone = "<p>Please enter your phone number.</p>";
+        $form_good = FALSE;
+    } else {
+        $phone = filter_var($phone, FILTER_SANITIZE_NUMBER_INT);
+    }
+    if ($phone == FALSE) {
+        $message_phone = "<p>Please enter your phone number without letters or special characters.</p>";
+        $form_good = FALSE;
+    } else {
+        // Let's strip out any potential extra characters the users punched in.
+        $phone = str_replace('-', '', $phone);
+        $phone = str_replace('+', '', $phone);
+        $phone = str_replace('.', '', $phone);
+        $phone = str_replace('(', '', $phone);
+        $phone = str_replace(')', '', $phone);
+    }
+    // Let's check to see if, after we've stripped all of the special characters away, whether or not we have a number left.
+    if (!is_numeric($phone)) {
+        $message_phone = "<p>Please enter your phone number without letters or special characters.</p>";
+        $form_good = FALSE;
+    } else {
+        // Let's test the length of the number. Let's assume we want a Canadian number. That means we want 10 digits. (ex. 780 123 4567)
+        if (strlen($phone) != 10) {
+            $message_phone = "<p>Please enter a ten-digit Canadian phone number without the country code.</p>";
+            $form_good = FALSE;
+        }
+    }
 }
+
+
 
 if ($form_good == TRUE) {
     $message_pass = "<p>Congratulations you have sucessfully registered!</p>";
@@ -174,8 +188,8 @@ if ($form_good == TRUE) {
                             <?php echo $message_password; ?>
                         </div>
                     </div>
-                        <!-- Confirm Password -->
-                        <div class="mb-3">
+                    <!-- Confirm Password -->
+                    <div class="mb-3">
                         <label for="confirm-password" class="form-label">Confirm Password</label>
                         <input id="confirm-password" name="confirm-password" type="password" class="form-control"
                             aria-describedby="confirm-password-help">
@@ -208,12 +222,24 @@ if ($form_good == TRUE) {
         </section>
     </main>
     <h1>Output Values</h1>
-	<p>First Name: <?php echo $first_name; ?></p>
-	<p>Last Name: <?php echo $last_name; ?></p>
-	<p>Email: <?php echo $email; ?></p>
-	<p>Password: <?php echo $password; ?></p>
-	<p>Confirm Password: <?php echo $confirm_password; ?></p>
-	<p>Phone: <?php echo $phone; ?></p>
+    <p>First Name:
+        <?php echo $first_name; ?>
+    </p>
+    <p>Last Name:
+        <?php echo $last_name; ?>
+    </p>
+    <p>Email:
+        <?php echo $email; ?>
+    </p>
+    <p>Password:
+        <?php echo $password; ?>
+    </p>
+    <p>Confirm Password:
+        <?php echo $confirm_password; ?>
+    </p>
+    <p>Phone:
+        <?php echo $phone; ?>
+    </p>
 </body>
 
 </html>
