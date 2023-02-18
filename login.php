@@ -1,23 +1,12 @@
 <?php
-
-
 $email = (isset($_POST['submit'])) ? trim($_POST['email']) : "";
 $password = (isset($_POST['submit'])) ? trim($_POST['password']) : "";
-
-
-
-$password_hash = password_hash($password,PASSWORD_DEFAULT);
-
 // Message Variables
 $message_email = "";
 $message_password = "";
 $message_pass = "";
-$message_form = "";
-
 $form_good = null;
-
 if (isset($_POST['submit'])) {
-
     $form_good = TRUE;
 
     // EMAIL VALIDATION
@@ -47,26 +36,35 @@ if (isset($_POST['submit'])) {
             $message_email = "<p>Please enter a valid email address, including an @ and a top-level domain.</p>";
             $form_good = FALSE;
         }
-
     }
     //Password Validation 
     if(strlen($password)<8){
         $message_password = "<p>Your password cannot be less than 8 characters long </p>";
         $form_good = FALSE;
     }
-    if($password !== $confirm_password){
-        $message_confirm_password = "<p>Your passwords do not match </p>";
-        $form_good = FALSE; 
-    }
 
 
-    
 }
 
-
-
 if ($form_good == TRUE) {
-
+    include_once("database-connection.php");
+    $sql_verify = "SELECT * FROM authentication WHERE Email_ID = '$email'";
+    $result = mysqli_query($connect,$sql_verify);
+    $user = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    if($user){
+        if(password_verify($password, $user["Password"])){
+            $message_pass = "<p>You have sucessfully logged in </p>";
+            header("Location: index.html");
+        }
+        else {
+            $message_password = "<p>Your password does not match </p>";
+            $form_good = FALSE;
+        }
+    }
+    else {
+        $message_email = "<p>Email Does not exists</p>"; 
+        $form_good = FALSE;
+    }
 }
 
 
