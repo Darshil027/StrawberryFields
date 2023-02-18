@@ -143,26 +143,28 @@ if ($form_good == TRUE) {
         else {
             $sql_auth = "INSERT INTO authentication(Email_ID, Password) VALUES (?,?)";
             $sql_cust = "INSERT INTO Customer(Email_ID, FirstName, LastName, Phone) VALUES (?,?,?,?)";
-            // use transactions to ensure both inserts succeed or fail together
+            // using transactions to ensure both inserts succeed or fail together
             mysqli_autocommit($connect, FALSE);
             $error = FALSE;
 
-            //mysqli_stmt_init() is used to initialize a new statement object, which is then prepared with a SQL statement using mysqli_stmt_prepare()
+            //mysqli_stmt_init() is used to initialize a new statement object.A statement object is an object that represents a prepared statement that you can execute multiple times with different parameters.
             $initialize_statement_auth = mysqli_stmt_init($connect);
+
+            //mysqli_stmt_prepare  Prepares a SQL query for execution with a statement object. 
             $prepare_statement_auth = mysqli_stmt_prepare($initialize_statement_auth, $sql_auth);
 
             $initialize_statement_cust = mysqli_stmt_init($connect);
             $prepare_statement_cust = mysqli_stmt_prepare($initialize_statement_cust, $sql_cust);
 
             if ($prepare_statement_auth && $prepare_statement_cust) {
-                    // session_start();
-                
+                    //mysqli_stmt_bind_param. Binds parameters to a prepared statement. Once you've prepared a statement object with a SQL query, you can use this function to bind parameter values to the placeholders in the query. 
                    //the first argument should be the statement object, second argument should be the type of values
                    //the ss means that two variables are being bound, and both variables are string 
                    mysqli_stmt_bind_param($initialize_statement_auth,"ss" ,$email , $password_hash);
                    mysqli_stmt_execute($initialize_statement_auth);
             
                    mysqli_stmt_bind_param($initialize_statement_cust,"ssss" ,$email , $first_name, $last_name, $phone);
+                   //mysqli_stmt_execute. Executes a prepared statement. Once you've prepared a statement object with a SQL query and bound parameter values to it, you can use this function to execute the query. The function takes a single argument, which is the statement object.
                    mysqli_stmt_execute($initialize_statement_cust);
                     // mysqli_errno the error number for the most recent MySQLi function call
                     //The error number is a unique code that corresponds to a specific error condition. When a MySQLi function call fails, it sets an error code, which can be retrieved using mysqli_errno().
