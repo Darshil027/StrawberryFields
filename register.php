@@ -1,5 +1,8 @@
 <?php
-
+session_start();
+if (isset($_SESSION["user"])) {
+    header("Location: appointment.php");
+}
 $first_name = (isset($_POST['submit'])) ? trim($_POST['first-name']) : "";
 $last_name = (isset($_POST['submit'])) ? trim($_POST['last-name']) : "";
 $email = (isset($_POST['submit'])) ? trim($_POST['email']) : "";
@@ -9,6 +12,7 @@ $phone = (isset($_POST['submit'])) ? trim($_POST['phone']) : "";
 
 //Encryption of password 
 $password_hash = password_hash($password,PASSWORD_DEFAULT);
+
 
 // Message Variables
 $message_first_name = "";
@@ -143,11 +147,15 @@ if ($form_good == TRUE) {
        $initialize_statement = mysqli_stmt_init($connect);
        $prepare_statement = mysqli_stmt_prepare($initialize_statement, $sql);
        if ($prepare_statement) {
+        // session_start();
+        
            //the first argument should be the statement object, second argument should be the type of values
            //the ss means that two variables are being bound, and both variables are string 
            mysqli_stmt_bind_param($initialize_statement,"ss" ,$email , $password_hash);
            mysqli_stmt_execute($initialize_statement);
-           $message_pass = "<p>Congratulations you have sucessfully registered!</p>";
+           $_SESSION["user"] = "yes";
+           header("Location: appointment.php");
+           //$message_pass = "<p>Congratulations you have sucessfully registered!</p>";
        }
        //if execution failure occurs 
        else {

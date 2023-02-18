@@ -56,7 +56,7 @@ if ($form_good == TRUE) {
     $user = mysqli_fetch_array($result, MYSQLI_ASSOC);
     if ($user) {
         if (password_verify($password, $user["Password"])) {
-            $message_pass = "<p>You have sucessfully logged in </p>";
+            //$message_pass = "<p>You have sucessfully logged in </p>";
             // session_start();
             $_SESSION["user"] = "yes";
             header("Location: appointment.php");
@@ -91,7 +91,7 @@ if ($form_good == TRUE) {
         <section class="row">
             <div class="col bg-white rounded p-5 border border-secondary-subtle">
                 <h1 class="fw-light">Login</h1>
-                <p class="text-muted">Login using the form below </p>
+                <p class="text-muted">Please Login/Register to Book Appointment </p>
 
                 <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="my-3" method="POST">
 
@@ -122,6 +122,7 @@ if ($form_good == TRUE) {
                         <div class="col-md-6 text-center">
                             <a href="register.php" class="btn btn-primary">Register</a>
                         </div>
+                        
                     </div>
 
                 </form>
