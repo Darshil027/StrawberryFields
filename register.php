@@ -131,38 +131,57 @@ if (isset($_POST['submit'])) {
 
 
 if ($form_good == TRUE) {
-    include_once("database-connection.php");
-    //check if the email already exists
-    $sql_check = "SELECT * FROM authentication where Email_ID = '$email'";
-    $result = mysqli_query($connect,$sql_check);
-    $row_count = mysqli_num_rows($result);
-    if ($result && $row_count > 0) {
+        include_once("database-connection.php");
+        //check if the email already exists
+        $sql_check = "SELECT * FROM authentication where Email_ID = '$email'";
+        $result = mysqli_query($connect,$sql_check);
+        $row_count = mysqli_num_rows($result);
+        if ($result && $row_count > 0){
         $message_form = "<p>The email already exists</p>";
         $form_good = false;
-    }
-    else {
-        $sql = "INSERT INTO authentication(Email_ID, Password) VALUES (?,?)";
+        }  
+        else {
+            $sql_auth = "INSERT INTO authentication(Email_ID, Password) VALUES (?,?)";
+            $sql_cust = "INSERT INTO Customer(Email_ID, FirstName, LastName, Phone) VALUES (?,?,?,?)";
+            // use transactions to ensure both inserts succeed or fail together
+            mysqli_autocommit($connect, FALSE);
+            $error = FALSE;
 
-        //mysqli_stmt_init() is used to initialize a new statement object, which is then prepared with a SQL statement using mysqli_stmt_prepare()
-       $initialize_statement = mysqli_stmt_init($connect);
-       $prepare_statement = mysqli_stmt_prepare($initialize_statement, $sql);
-       if ($prepare_statement) {
-        // session_start();
-        
-           //the first argument should be the statement object, second argument should be the type of values
-           //the ss means that two variables are being bound, and both variables are string 
-           mysqli_stmt_bind_param($initialize_statement,"ss" ,$email , $password_hash);
-           mysqli_stmt_execute($initialize_statement);
-           $_SESSION["user"] = "yes";
-           header("Location: appointment.php");
-           //$message_pass = "<p>Congratulations you have sucessfully registered!</p>";
-       }
-       //if execution failure occurs 
-       else {
-           die("Execution failed in the database");
-       }
-    }
-    
+            //mysqli_stmt_init() is used to initialize a new statement object, which is then prepared with a SQL statement using mysqli_stmt_prepare()
+            $initialize_statement_auth = mysqli_stmt_init($connect);
+            $prepare_statement_auth = mysqli_stmt_prepare($initialize_statement_auth, $sql_auth);
+
+            $initialize_statement_cust = mysqli_stmt_init($connect);
+            $prepare_statement_cust = mysqli_stmt_prepare($initialize_statement_cust, $sql_cust);
+
+            if ($prepare_statement_auth && $prepare_statement_cust) {
+                    // session_start();
+                
+                   //the first argument should be the statement object, second argument should be the type of values
+                   //the ss means that two variables are being bound, and both variables are string 
+                   mysqli_stmt_bind_param($initialize_statement_auth,"ss" ,$email , $password_hash);
+                   mysqli_stmt_execute($initialize_statement_auth);
+            
+                   mysqli_stmt_bind_param($initialize_statement_cust,"ssss" ,$email , $first_name, $last_name, $phone);
+                   mysqli_stmt_execute($initialize_statement_cust);
+                    // mysqli_errno the error number for the most recent MySQLi function call
+                    //The error number is a unique code that corresponds to a specific error condition. When a MySQLi function call fails, it sets an error code, which can be retrieved using mysqli_errno().
+                   if (mysqli_errno($connect)) {
+                       $error = TRUE;
+                   }
+               }
+            
+                // commit or rollback the transaction
+                if ($error) {
+                    mysqli_rollback($connect);
+                    $message_form = "<p>Failed to insert record into the database</p>";
+                } else {
+                    mysqli_commit($connect);
+                    $_SESSION["user"] = "yes";
+                    header("Location: appointment.php");
+                    //$message_pass = "<p>Congratulations you have sucessfully registered!</p>";
+                }
+        }
 
 }
 
