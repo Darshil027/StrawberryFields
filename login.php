@@ -1,4 +1,9 @@
 <?php
+
+session_start();
+if (isset($_SESSION["user"])) {
+    header("Location: appointment.php");
+}
 $email = (isset($_POST['submit'])) ? trim($_POST['email']) : "";
 $password = (isset($_POST['submit'])) ? trim($_POST['password']) : "";
 // Message Variables
@@ -14,21 +19,19 @@ if (isset($_POST['submit'])) {
         $message_email = "<p>Please enter your email address.</p>";
         $form_good = FALSE;
     } else {
-    
+
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
     }
     if ($email == FALSE) {
         $message_email = "<p>Please enter a valid email address.</p>";
         $form_good = FALSE;
-    }
-   
-    else {
+    } else {
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
     }
     if ($email == FALSE) {
         $message_email = "<p>Please enter a valid email address, including an @ and a top-level domain.</p>";
         $form_good = FALSE;
-    }else {
+    } else {
 
         $pattern = "^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$^";
 
@@ -38,7 +41,7 @@ if (isset($_POST['submit'])) {
         }
     }
     //Password Validation 
-    if(strlen($password)<8){
+    if (strlen($password) < 8) {
         $message_password = "<p>Your password cannot be less than 8 characters long </p>";
         $form_good = FALSE;
     }
@@ -49,20 +52,20 @@ if (isset($_POST['submit'])) {
 if ($form_good == TRUE) {
     include_once("database-connection.php");
     $sql_verify = "SELECT * FROM authentication WHERE Email_ID = '$email'";
-    $result = mysqli_query($connect,$sql_verify);
+    $result = mysqli_query($connect, $sql_verify);
     $user = mysqli_fetch_array($result, MYSQLI_ASSOC);
-    if($user){
-        if(password_verify($password, $user["Password"])){
+    if ($user) {
+        if (password_verify($password, $user["Password"])) {
             $message_pass = "<p>You have sucessfully logged in </p>";
-            header("Location: index.html");
-        }
-        else {
+            // session_start();
+            $_SESSION["user"] = "yes";
+            header("Location: appointment.php");
+        } else {
             $message_password = "<p>Your password does not match </p>";
             $form_good = FALSE;
         }
-    }
-    else {
-        $message_email = "<p>Email Does not exists</p>"; 
+    } else {
+        $message_email = "<p>Email Does not exists</p>";
         $form_good = FALSE;
     }
 }
@@ -74,13 +77,16 @@ if ($form_good == TRUE) {
 
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  </head>
-  <body class="bg-secondary-subtle">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+</head>
+
+<body class="bg-secondary-subtle">
     <main class="d-flex justify-content-center align-items-center min-vh-100 p-3">
         <section class="row">
             <div class="col bg-white rounded p-5 border border-secondary-subtle">
@@ -88,18 +94,19 @@ if ($form_good == TRUE) {
                 <p class="text-muted">Login using the form below </p>
 
                 <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="my-3" method="POST">
-             
-                <!-- Email Address -->
+
+                    <!-- Email Address -->
                     <div class="mb-3">
                         <label for="email" class="form-label">Email Address</label>
-                        <input id="email" name="email" type="text" class="form-control" aria-describedby="email-help" value="<?php echo $email; ?>">
+                        <input id="email" name="email" type="text" class="form-control" aria-describedby="email-help"
+                            value="<?php echo $email; ?>">
                         <div class="form-text" id="email-help">
                             <?php echo $message_email; ?>
                         </div>
                     </div>
-             
-                 <!-- Password -->
-                 <div class="mb-3">
+
+                    <!-- Password -->
+                    <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input id="password" name="password" type="password" class="form-control"
                             aria-describedby="password-help">
@@ -107,10 +114,16 @@ if ($form_good == TRUE) {
                             <?php echo $message_password; ?>
                         </div>
                     </div>
-                <!-- Submit Button -->
-                    <div class="d-flex justify-content-center">
-                        <input type="submit" name="submit" class="btn btn-primary" value="Login">
+                    <!-- Submit Button -->
+                    <div class="row">
+                        <div class="col-md-6 text-center">
+                            <input type="submit" name="submit" class="btn btn-primary" value="Login">
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <a href="register.php" class="btn btn-primary">Register</a>
+                        </div>
                     </div>
+
                 </form>
 
                 <!-- This area will echo out a success message if the data is valid and passes our gauntlet. -->
@@ -122,5 +135,6 @@ if ($form_good == TRUE) {
             </div>
         </section>
     </main>
-  </body>
+</body>
+
 </html>

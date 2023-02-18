@@ -236,7 +236,7 @@ if ($form_good == TRUE) {
                     </div>
                     <!-- Submit Button -->
                     <div class="d-flex justify-content-center">
-                        <input type="submit" name="submit" class="btn btn-primary" value="Send Message">
+                        <input type="submit" name="submit" class="btn btn-primary" value="Register">
                     </div>
                 </form>
 
@@ -249,25 +249,7 @@ if ($form_good == TRUE) {
             </div>
         </section>
     </main>
-    <h1>Output Values</h1>
-    <p>First Name:
-        <?php echo $first_name; ?>
-    </p>
-    <p>Last Name:
-        <?php echo $last_name; ?>
-    </p>
-    <p>Email:
-        <?php echo $email; ?>
-    </p>
-    <p>Password:
-        <?php echo $password; ?>
-    </p>
-    <p>Confirm Password:
-        <?php echo $confirm_password; ?>
-    </p>
-    <p>Phone:
-        <?php echo $phone; ?>
-    </p>
+   
 </body>
 
 </html>
